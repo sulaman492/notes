@@ -1,10 +1,11 @@
-import { notesModel } from "../models/note.model";
+import { notesModel } from "../models/note.model.js";
 
 
 export const createNote=async (req,res) => {
     try {
         const {title,content}=req.body
         const note=await notesModel.create({title,content})
+        console.log("created")
         return res.status(201).json({success:true,message:"note created succesfully",note})
     } catch (error) {
         return res.status(500).json({success:false,message:"something went wrong"})
@@ -24,6 +25,7 @@ export const createNote=async (req,res) => {
 
 export const editNote=async (req,res) => {
     try {
+        
         const id=req.params.id
         const {title,content}=req.body
         const note=await notesModel.findOne({_id: id})

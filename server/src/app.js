@@ -5,6 +5,8 @@ import NotesRoute from "./routes/note.route.js"
 const app=express()
 connectDB()
 
+app.use(express.json())
+
 app.get("/",(req,res)=>{
     res.send("hello world")
 })

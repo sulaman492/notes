@@ -7,8 +7,8 @@ router.get("/getAllNotes",getAllNote)
 
 router.post("/createNote",createNote)
 
-router.put("/editNote",editNote)
+router.put("/editNote/:id",editNote)
 
-router.delete("/deleteNote",deleteNote)
+router.delete("/deleteNote/:id",deleteNote)
 
 export default router
