@@ -6,8 +6,10 @@ import { instance } from '../api/api'
 const Home = () => {
 
     const [note, setNote] = useState([])
-    const [leftSideShowingAllNotes,setleftSideShowingAllNotes]=useState(true)
-    
+    const [title, setTitle] = useState("")
+    const [content, setContent] = useState("")
+    const [rightSideShowingAllNotes, setRightSideShowingAllNotes] = useState(true)
+
     useEffect(() => { getAllNote() }, [])
 
     const getAllNote = async () => {
@@ -20,16 +22,37 @@ const Home = () => {
         }
     }
 
-    const createNote = async () => {
-
+    const handleCreateButton = () => {
+        if (rightSideShowingAllNotes) {
+            setRightSideShowingAllNotes(false)
+        }
+        else{
+            setRightSideShowingAllNotes(true)
+        }
     }
 
-    const editNote = async () => {
-
+    const handleTitleChange = (e) => {
+        setTitle(e.target.value)
     }
 
-    const deleteNote = async () => {
+    const handleContentChange = (e) => {
+        setContent(e.target.value)
+    }
 
+    const handleNoteSubmit=async (e)=>{
+        e.preventDefault()
+        try {
+            const response=await instance.post("/createNote",{
+                title:title,
+                content:content
+            })
+            console.log(response.data);
+            
+        } catch (error) {
+            console.log("error while create note",error);
+        }
+        getAllNote()
+        handleCreateButton()
     }
 
     return (
@@ -37,12 +60,12 @@ const Home = () => {
             <div className='w-full h-full flex'>
                 {/* left side */}
                 <div className='left border  border-blue-900 w-1/3 h-screen'>
-                    <button >
+                    <button onClick={handleCreateButton}>
                         create note
                     </button>
                 </div>
                 {/* right side */}
-                <div className='right w-full h-screen border  border-red-900'>
+                {rightSideShowingAllNotes ? <div className='right w-full h-screen border  border-red-900'>
                     {
                         note.map((note) => {
                             return <div key={note._id} className='flex flex-col'>
@@ -51,7 +74,19 @@ const Home = () => {
                             </div>
                         })
                     }
-                </div>
+                </div> :
+                    <div>
+                        <form onSubmit={handleNoteSubmit}>
+                            <input className='border border-amber-400' value={title} onChange={handleTitleChange} />
+
+                            <textarea className="border border-amber-400" value={content} onChange={handleContentChange} >
+                                
+                            </textarea>
+                        <button type='submit'>save</button>
+                        <button onClick={handleCreateButton}>cancel</button>
+                        </form>
+                    </div>
+                }
             </div>
         </div>
     )
