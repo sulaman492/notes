@@ -9,6 +9,8 @@ const Home = () => {
     const [title, setTitle] = useState("")
     const [content, setContent] = useState("")
     const [rightSideShowingAllNotes, setRightSideShowingAllNotes] = useState(true)
+    const [editNote, setEditNote] = useState(false)
+    const [id, setId] = useState("")
 
     useEffect(() => { getAllNote() }, [])
 
@@ -65,6 +67,33 @@ const Home = () => {
         getAllNote()
     }
 
+    const handleEditNote=async (id,title,content) => {
+        setEditNote(true)
+        setRightSideShowingAllNotes(false)
+        setTitle(title)
+        setContent(content)
+        setId(id)
+    }
+
+    const handleEditFormSubmit=async (e) => {
+        e.preventDefault()
+        alert("hello")
+        try {
+            const response=await instance.put(`/editNote/${id}`,{
+                title:title,
+                content:content
+            })
+        } catch (error) {
+            console.log("error while editing the note ",error);
+        }
+        getAllNote()
+        handleCancelButton()
+    }
+    const handleCancelButton=async () => {
+        setEditNote(false)
+        setRightSideShowingAllNotes(true)
+    }
+
     return (
         <div className='w-screen h-screen border border-green-500'>
             <div className='w-full h-full flex'>
@@ -82,13 +111,21 @@ const Home = () => {
                                 <h3>{note.title}</h3>
                                 <p>{note.content}</p>
                                 <div className='flex gap-2 m-2'>
-                                    <button className='cursor-pointer bg-green-400 rounded-md p-1 font-semi-bold' >edit</button>
+                                    <button className='cursor-pointer bg-green-400 rounded-md p-1 font-semi-bold' onClick={()=>(handleEditNote(note._id,note.title,note.content))}>edit</button>
                                     <button className='cursor-pointer bg-red-400 rounded-md p-1 font-semi-bold' onClick={()=>(handleDeleteNote(note._id))}>delete</button>
                                 </div>
                             </div>
                         })
                     }
-                </div> :
+                </div> :editNote? <div>
+                    <form onSubmit={handleEditFormSubmit}>
+                        <input className='border border-amber-400' type="text" value={title} onChange={handleTitleChange}/>
+                        <textarea className="border border-amber-400" value={content} onChange={handleContentChange} >
+                        </textarea>
+                        <button type="button" onClick={handleCancelButton}>cancel</button>
+                        <button type='submit'>save</button>
+                    </form>
+                </div>:
                     <div>
                         <form onSubmit={handleNoteSubmit}>
                             <input className='border border-amber-400' value={title} onChange={handleTitleChange} />
@@ -97,7 +134,7 @@ const Home = () => {
 
                             </textarea>
                             <button type='submit'>save</button>
-                            <button onClick={handleCreateButton}>cancel</button>
+                            <button type='button' onClick={handleCreateButton}>cancel</button>
                         </form>
                     </div>
                 }
